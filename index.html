@@ -1,0 +1,3207 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a0a1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Luna AI">
+<title>Luna AI Sekretarica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --dark-bg: #080818;
+  --dark-surface: #0f0f28;
+  --dark-card: #141430;
+  --dark-card2: #1a1a3a;
+  --neon-blue: #4f8ef7;
+  --neon-purple: #a855f7;
+  --neon-pink: #ec4899;
+  --neon-cyan: #06b6d4;
+  --light-bg: #e8e8f0;
+  --light-surface: #f0f0f8;
+  --light-card: #ffffff;
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255,255,255,0.6);
+  --text-muted: rgba(255,255,255,0.35);
+  --accent: #4f8ef7;
+  --glow: 0 0 20px rgba(79,142,247,0.4);
+  --shadow-dark: 8px 8px 24px rgba(0,0,0,0.6), -4px -4px 12px rgba(255,255,255,0.04);
+  --shadow-inset: inset 4px 4px 12px rgba(0,0,0,0.5), inset -2px -2px 8px rgba(255,255,255,0.05);
+  --radius: 20px;
+  --radius-sm: 12px;
+  --radius-lg: 28px;
+  --transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+  --3d-depth: 1;
+  --glow-intensity: 1;
+  --glass-opacity: 0.08;
+  --shadow-intensity: 1;
+  --border-radius-mult: 1;
+}
+[data-theme="light"] {
+  --dark-bg: #dde0eb;
+  --dark-surface: #e4e7f2;
+  --dark-card: #eceef8;
+  --dark-card2: #f0f2fa;
+  --text-primary: #1a1a3a;
+  --text-secondary: rgba(26,26,58,0.6);
+  --text-muted: rgba(26,26,58,0.35);
+  --shadow-dark: 8px 8px 24px rgba(0,0,0,0.12), -4px -4px 12px rgba(255,255,255,0.8);
+  --shadow-inset: inset 4px 4px 12px rgba(0,0,0,0.08), inset -2px -2px 8px rgba(255,255,255,0.9);
+  --light-bg: #e0e3ee;
+  --light-surface: #e8ebf5;
+  --neon-blue: #3b7de8;
+  --neon-purple: #9333ea;
+  --accent: #3b7de8;
+}
+[data-theme="amoled"] {
+  --dark-bg: #000000;
+  --dark-surface: #050505;
+  --dark-card: #0a0a0a;
+  --dark-card2: #0f0f0f;
+  --shadow-dark: 8px 8px 24px rgba(0,0,0,0.9), -4px -4px 12px rgba(255,255,255,0.02);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html { height: 100%; overflow: hidden; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--dark-bg);
+  color: var(--text-primary);
+  height: 100%;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* App Shell */
+#app {
+  width: 100%;
+  max-width: 430px;
+  height: 100dvh;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  background: var(--dark-bg);
+}
+
+/* Screen system */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.35s;
+  will-change: transform, opacity;
+}
+.screen.hidden { transform: translateX(100%); opacity: 0; pointer-events: none; }
+.screen.slide-left { transform: translateX(-100%); opacity: 0; pointer-events: none; }
+
+/* Header */
+.header {
+  background: var(--dark-bg);
+  padding: 16px 20px 12px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+}
+.header-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.avatar-wrap {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+}
+.avatar-ring {
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple), var(--neon-pink));
+  animation: rotate-ring 4s linear infinite;
+}
+@keyframes rotate-ring {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.avatar-img {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  z-index: 1;
+  border: 3px solid var(--dark-bg);
+  overflow: hidden;
+}
+.avatar-img img { width: 100%; height: 100%; object-fit: cover; }
+.agent-info { flex: 1; }
+.agent-name {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #fff 0%, var(--neon-blue) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.agent-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+.header-badges {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.badge-groq {
+  background: linear-gradient(135deg, #f59e0b, #f97316);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 2px 8px rgba(245,158,11,0.4);
+}
+.badge-offline {
+  background: linear-gradient(135deg, #6b7280, #4b5563);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.badge-theme {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--dark-card);
+  box-shadow: var(--shadow-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.badge-theme:active { transform: scale(0.92); }
+.user-badge {
+  background: linear-gradient(135deg, var(--neon-blue), var(--neon-cyan));
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 7px 14px;
+  border-radius: 22px;
+  box-shadow: 0 2px 12px rgba(79,142,247,0.4);
+  cursor: pointer;
+}
+.menu-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+  margin-left: 4px;
+}
+.menu-btn span {
+  width: 22px;
+  height: 2px;
+  background: var(--text-primary);
+  border-radius: 2px;
+  transition: var(--transition);
+}
+
+/* Search */
+.search-bar {
+  background: var(--dark-card);
+  border-radius: 16px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: var(--shadow-inset);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.search-bar input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-size: 15px;
+  font-family: inherit;
+}
+.search-bar input::placeholder { color: var(--text-muted); }
+.search-icon { color: var(--text-muted); font-size: 16px; }
+
+/* Wave separator */
+.wave-sep {
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+  flex-shrink: 0;
+}
+.wave-sep svg { display: block; width: 100%; }
+
+/* Main scroll area - dark top */
+.main-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.main-scroll::-webkit-scrollbar { display: none; }
+
+/* Dashboard grid */
+.dash-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 16px 20px 8px;
+}
+.dash-card {
+  background: var(--dark-card);
+  border-radius: calc(var(--radius) * var(--border-radius-mult, 1));
+  padding: 16px;
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: calc(var(--3d-depth) * 6px) calc(var(--3d-depth) * 6px) calc(var(--3d-depth) * 20px) rgba(0,0,0,0.5),
+              calc(var(--3d-depth) * -2px) calc(var(--3d-depth) * -2px) calc(var(--3d-depth) * 8px) rgba(255,255,255,0.04);
+  overflow: hidden;
+}
+.dash-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,calc(var(--glass-opacity, 0.08) * 2)), transparent);
+}
+.dash-card:active { transform: scale(0.96) translateY(2px); }
+.dash-card.wide { grid-column: span 2; }
+.dash-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: var(--dark-card2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  margin-bottom: 10px;
+  box-shadow: var(--shadow-inset);
+}
+.dash-card-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.dash-card-count {
+  font-size: 24px;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-top: 2px;
+}
+.badge-dot {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #ef4444;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(239,68,68,0.5);
+}
+
+/* Light section */
+.light-section {
+  background: var(--light-bg);
+  border-radius: 32px 32px 0 0;
+  padding: 20px 20px 8px;
+  position: relative;
+}
+[data-theme="light"] .light-section { background: #d5d8e8; }
+
+/* AI Personalities */
+.personality-row {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  padding: 4px 2px;
+}
+.personality-btn {
+  flex: 1;
+  background: var(--light-card);
+  border-radius: 18px;
+  padding: 12px 6px 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 4px 4px 12px rgba(0,0,0,0.1), -2px -2px 8px rgba(255,255,255,0.7);
+  border: 2px solid transparent;
+}
+[data-theme="dark"] .personality-btn, [data-theme="amoled"] .personality-btn {
+  background: var(--dark-card2);
+  box-shadow: 4px 4px 12px rgba(0,0,0,0.4), -2px -2px 8px rgba(255,255,255,0.03);
+}
+.personality-btn.active {
+  border-color: var(--neon-blue);
+  box-shadow: 4px 4px 12px rgba(0,0,0,0.1), -2px -2px 8px rgba(255,255,255,0.7), 0 0 0 1px var(--neon-blue), 0 0 12px rgba(79,142,247,0.3);
+}
+.personality-btn:active { transform: scale(0.94); }
+.personality-emoji { font-size: 26px; margin-bottom: 4px; }
+.personality-label { font-size: 10px; font-weight: 600; color: var(--text-secondary); }
+[data-theme="light"] .personality-label { color: rgba(26,26,58,0.55); }
+
+/* Mic button */
+.mic-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 0 8px;
+}
+.mic-btn-wrap {
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+.mic-rings {
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.mic-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  animation: mic-pulse 2s ease-in-out infinite;
+  opacity: 0;
+}
+.mic-ring:nth-child(1) { border-color: rgba(79,142,247,0.5); animation-delay: 0s; }
+.mic-ring:nth-child(2) { border-color: rgba(168,85,247,0.4); animation-delay: 0.4s; inset: -8px; }
+.mic-ring:nth-child(3) { border-color: rgba(236,72,153,0.3); animation-delay: 0.8s; inset: -16px; }
+@keyframes mic-pulse {
+  0%, 100% { transform: scale(1); opacity: 0; }
+  50% { transform: scale(1.15); opacity: 1; }
+}
+.mic-btn {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1a1a3a, #0f0f28);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: var(--transition);
+  box-shadow: 6px 6px 20px rgba(0,0,0,0.5), -3px -3px 10px rgba(255,255,255,0.05),
+              0 0 0 4px rgba(79,142,247,0.2);
+}
+.mic-btn::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, var(--neon-pink), var(--neon-blue), var(--neon-purple), var(--neon-cyan), var(--neon-pink));
+  animation: rotate-ring 3s linear infinite;
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), black calc(100% - 3px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), black calc(100% - 3px));
+}
+.mic-btn svg { width: 32px; height: 32px; fill: white; position: relative; z-index: 1; }
+.mic-btn:active { transform: scale(0.92); }
+.mic-btn.listening .mic-ring { animation-play-state: running; }
+.mic-btn.listening {
+  box-shadow: 6px 6px 20px rgba(0,0,0,0.5), -3px -3px 10px rgba(255,255,255,0.05),
+              0 0 30px rgba(79,142,247,0.6), 0 0 60px rgba(168,85,247,0.3);
+}
+.mic-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  margin-top: 12px;
+  text-transform: uppercase;
+}
+[data-theme="light"] .mic-label { color: rgba(26,26,58,0.4); }
+
+/* Bottom nav */
+.bottom-nav {
+  background: var(--light-bg);
+  display: flex;
+  padding: 8px 32px 20px;
+  gap: 0;
+  flex-shrink: 0;
+  border-top: 1px solid rgba(0,0,0,0.06);
+}
+[data-theme="dark"] .bottom-nav, [data-theme="amoled"] .bottom-nav {
+  background: var(--dark-surface);
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+.nav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 14px;
+  transition: var(--transition);
+  border: none;
+  background: none;
+  color: var(--text-muted);
+}
+.nav-btn.active { color: var(--accent); }
+.nav-btn svg { width: 22px; height: 22px; }
+.nav-btn span { font-size: 10px; font-weight: 600; }
+.nav-btn:active { transform: scale(0.9); }
+
+/* Status bar */
+.status-bar {
+  display: flex;
+  gap: 6px;
+  padding: 4px 20px 0;
+  flex-wrap: wrap;
+}
+.status-dot {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.status-dot::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #6b7280;
+}
+.status-dot.online::before { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.6); }
+.status-dot.error::before { background: #ef4444; }
+
+/* Section titles */
+.section-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+[data-theme="light"] .section-title { color: rgba(26,26,58,0.4); }
+
+/* SUBSCREENS */
+.sub-header {
+  background: var(--dark-bg);
+  padding: 16px 20px 14px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+[data-theme="light"] .sub-header { border-bottom: 1px solid rgba(0,0,0,0.06); }
+.back-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: var(--dark-card);
+  box-shadow: var(--shadow-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: var(--transition);
+}
+.back-btn:active { transform: scale(0.9); }
+.sub-title { font-size: 18px; font-weight: 700; }
+.sub-action {
+  margin-left: auto;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+  box-shadow: 0 2px 12px rgba(79,142,247,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 20px;
+  color: white;
+  border: none;
+  transition: var(--transition);
+}
+.sub-action:active { transform: scale(0.9); }
+
+/* Lists */
+.list-scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 12px 20px 80px;
+}
+.list-scroll::-webkit-scrollbar { display: none; }
+
+.list-item {
+  background: var(--dark-card);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  transition: var(--transition);
+  border: 1px solid rgba(255,255,255,0.05);
+  box-shadow: var(--shadow-dark);
+  position: relative;
+}
+.list-item:active { transform: scale(0.98); }
+.list-item.done .item-title { text-decoration: line-through; opacity: 0.5; }
+
+.item-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: var(--dark-card2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-inset);
+}
+.item-body { flex: 1; min-width: 0; }
+.item-title { font-size: 14px; font-weight: 600; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.item-sub { font-size: 12px; color: var(--text-secondary); }
+.item-meta { display: flex; gap: 6px; align-items: center; margin-top: 5px; flex-wrap: wrap; }
+.tag {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: rgba(79,142,247,0.15);
+  color: var(--neon-blue);
+}
+.tag.urgent { background: rgba(239,68,68,0.15); color: #ef4444; }
+.tag.done { background: rgba(34,197,94,0.15); color: #22c55e; }
+.item-actions {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.item-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--dark-card2);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  transition: var(--transition);
+  box-shadow: var(--shadow-inset);
+}
+.item-btn:active { transform: scale(0.9); }
+.item-btn.delete:active { background: rgba(239,68,68,0.2); }
+
+/* Priority indicator */
+.priority-bar {
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+}
+.priority-bar.high { background: #ef4444; box-shadow: 0 0 8px rgba(239,68,68,0.5); }
+.priority-bar.medium { background: #f59e0b; }
+.priority-bar.low { background: #22c55e; }
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  padding: 0;
+  transition: var(--transition);
+}
+.modal-overlay.hidden { opacity: 0; pointer-events: none; }
+.modal-sheet {
+  background: var(--dark-surface);
+  border-radius: 28px 28px 0 0;
+  padding: 20px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  transform: translateY(0);
+  transition: var(--transition);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-bottom: none;
+}
+.modal-overlay.hidden .modal-sheet { transform: translateY(100%); }
+.modal-handle {
+  width: 40px;
+  height: 4px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 2px;
+  margin: 0 auto 20px;
+}
+.modal-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+
+/* Inputs */
+.input-group { margin-bottom: 14px; }
+.input-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+.input-field {
+  width: 100%;
+  background: var(--dark-card);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  color: var(--text-primary);
+  font-size: 15px;
+  font-family: inherit;
+  outline: none;
+  transition: var(--transition);
+  box-shadow: var(--shadow-inset);
+}
+.input-field:focus { border-color: var(--neon-blue); box-shadow: var(--shadow-inset), 0 0 0 2px rgba(79,142,247,0.2); }
+textarea.input-field { resize: none; min-height: 80px; }
+
+/* Buttons */
+.btn {
+  padding: 14px 20px;
+  border-radius: var(--radius-sm);
+  border: none;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: var(--transition);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary {
+  background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+  color: white;
+  box-shadow: 0 4px 16px rgba(79,142,247,0.4);
+}
+.btn-secondary {
+  background: var(--dark-card);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-dark);
+}
+.btn-danger {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  box-shadow: 0 4px 16px rgba(239,68,68,0.3);
+}
+.btn-row { display: flex; gap: 10px; }
+.btn-row .btn { flex: 1; }
+
+/* Toggle */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.toggle-label { font-size: 14px; font-weight: 500; }
+.toggle-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.toggle {
+  width: 50px;
+  height: 28px;
+  border-radius: 14px;
+  background: var(--dark-card2);
+  cursor: pointer;
+  position: relative;
+  transition: var(--transition);
+  box-shadow: var(--shadow-inset);
+  flex-shrink: 0;
+}
+.toggle.on { background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple)); }
+.toggle::after {
+  content: '';
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: white;
+  top: 3px;
+  left: 3px;
+  transition: var(--transition);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+.toggle.on::after { left: 25px; }
+
+/* Slider */
+.slider-row { margin-bottom: 12px; }
+.slider-label-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.slider-label { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
+.slider-val { font-size: 13px; color: var(--neon-blue); font-weight: 700; }
+input[type=range] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--dark-card2);
+  outline: none;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(79,142,247,0.5);
+}
+
+/* Chat screen */
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.chat-messages::-webkit-scrollbar { display: none; }
+.msg {
+  max-width: 80%;
+  padding: 12px 16px;
+  border-radius: 18px;
+  font-size: 14px;
+  line-height: 1.5;
+  animation: msg-in 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+@keyframes msg-in { from { transform: translateY(10px); opacity: 0; } }
+.msg.user {
+  align-self: flex-end;
+  background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+.msg.luna {
+  align-self: flex-start;
+  background: var(--dark-card);
+  color: var(--text-primary);
+  border-bottom-left-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: var(--shadow-dark);
+}
+.msg-time { font-size: 10px; opacity: 0.6; margin-top: 4px; }
+.typing-indicator { display: flex; gap: 4px; align-items: center; padding: 4px 0; }
+.typing-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--neon-blue);
+  animation: typing 1.2s ease-in-out infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typing { 0%, 60%, 100% { transform: translateY(0); opacity: 0.3; } 30% { transform: translateY(-6px); opacity: 1; } }
+
+.chat-input-row {
+  padding: 10px 16px 20px;
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  background: var(--dark-bg);
+  border-top: 1px solid rgba(255,255,255,0.05);
+  flex-shrink: 0;
+}
+.chat-input {
+  flex: 1;
+  background: var(--dark-card);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 22px;
+  padding: 12px 16px;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  resize: none;
+  max-height: 120px;
+  min-height: 44px;
+  box-shadow: var(--shadow-inset);
+}
+.chat-send {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 12px rgba(79,142,247,0.4);
+  transition: var(--transition);
+}
+.chat-send:active { transform: scale(0.9); }
+.chat-send svg { width: 20px; height: 20px; fill: white; }
+.chat-mic {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--dark-card);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-dark);
+  transition: var(--transition);
+}
+.chat-mic:active { transform: scale(0.9); }
+
+/* Toast */
+.toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-80px);
+  background: var(--dark-card2);
+  color: var(--text-primary);
+  padding: 12px 20px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 999;
+  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  border: 1px solid rgba(255,255,255,0.1);
+  white-space: nowrap;
+  max-width: 320px;
+  text-align: center;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* Alarm active screen */
+.alarm-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: radial-gradient(ellipse at center, #1a0a3a, #0a0a1a);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  animation: alarm-pulse 1s ease-in-out infinite;
+}
+@keyframes alarm-pulse { 0%, 100% { background: radial-gradient(ellipse at center, #1a0a3a, #0a0a1a); } 50% { background: radial-gradient(ellipse at center, #2a0a4a, #0a0a2a); } }
+.alarm-screen.hidden { display: none; }
+.alarm-bell { font-size: 80px; animation: bell-shake 0.5s ease-in-out infinite; }
+@keyframes bell-shake { 0%, 100% { transform: rotate(-10deg); } 50% { transform: rotate(10deg); } }
+.alarm-name { font-size: 28px; font-weight: 800; text-align: center; }
+.alarm-time { font-size: 48px; font-weight: 300; letter-spacing: -2px; }
+
+/* Calendar */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  padding: 4px;
+}
+.cal-day-header { text-align: center; font-size: 11px; font-weight: 700; color: var(--text-muted); padding: 4px 0; }
+.cal-day {
+  aspect-ratio: 1;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+}
+.cal-day:active { transform: scale(0.9); }
+.cal-day.other-month { color: var(--text-muted); opacity: 0.4; }
+.cal-day.today {
+  background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+  color: white;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(79,142,247,0.4);
+}
+.cal-day.has-event::after {
+  content: '';
+  position: absolute;
+  bottom: 3px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--neon-pink);
+}
+.cal-day.selected { background: var(--dark-card2); }
+.cal-nav { display: flex; align-items: center; justify-content: space-between; padding: 0 4px 12px; }
+.cal-nav-btn {
+  width: 32px; height: 32px;
+  border-radius: 10px;
+  background: var(--dark-card);
+  border: none;
+  color: var(--text-primary);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--shadow-dark);
+}
+.cal-month { font-size: 15px; font-weight: 700; }
+
+/* Settings sections */
+.settings-section { margin-bottom: 20px; }
+.settings-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  padding-left: 4px;
+}
+.settings-card {
+  background: var(--dark-card);
+  border-radius: var(--radius);
+  padding: 4px 16px;
+  box-shadow: var(--shadow-dark);
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+/* Theme selector */
+.theme-row {
+  display: flex;
+  gap: 10px;
+  padding: 8px 0;
+}
+.theme-opt {
+  flex: 1;
+  padding: 10px 8px;
+  border-radius: 14px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: var(--transition);
+  border: 2px solid transparent;
+}
+.theme-opt.active { border-color: var(--neon-blue); }
+.theme-opt:active { transform: scale(0.95); }
+.theme-light { background: #e8e8f0; color: #1a1a3a; }
+.theme-dark { background: #141430; color: white; }
+.theme-amoled { background: #000; color: white; }
+
+/* Planner */
+.planner-time-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.planner-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  min-height: 40px;
+}
+.planner-time-label { font-size: 11px; color: var(--text-muted); font-weight: 600; width: 36px; flex-shrink: 0; padding-top: 2px; }
+.planner-slot { flex: 1; }
+.planner-event {
+  background: linear-gradient(135deg, rgba(79,142,247,0.2), rgba(168,85,247,0.2));
+  border-left: 3px solid var(--neon-blue);
+  border-radius: 0 8px 8px 0;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 2px;
+}
+
+/* Skeleton loader */
+.skeleton {
+  background: linear-gradient(90deg, var(--dark-card) 25%, var(--dark-card2) 50%, var(--dark-card) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 8px;
+}
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+/* Status indicator pill */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--dark-card);
+  box-shadow: var(--shadow-dark);
+}
+.status-pill .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+/* Swipe delete */
+.swipe-wrapper { position: relative; overflow: hidden; border-radius: var(--radius-sm); margin-bottom: 10px; }
+.swipe-delete-bg {
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: 70px;
+  background: #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+.swipe-item { position: relative; transition: transform 0.2s; }
+
+/* Loading spinner */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255,255,255,0.2);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Select */
+select.input-field {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='white' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+}
+[data-theme="light"] select.input-field {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%231a1a3a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+}
+
+/* Priority select row */
+.priority-select {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+.priority-opt {
+  flex: 1;
+  padding: 8px;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 2px solid transparent;
+  background: var(--dark-card);
+  transition: var(--transition);
+}
+.priority-opt.high { color: #ef4444; }
+.priority-opt.medium { color: #f59e0b; }
+.priority-opt.low { color: #22c55e; }
+.priority-opt.selected.high { border-color: #ef4444; background: rgba(239,68,68,0.1); }
+.priority-opt.selected.medium { border-color: #f59e0b; background: rgba(245,158,11,0.1); }
+.priority-opt.selected.low { border-color: #22c55e; background: rgba(34,197,94,0.1); }
+
+/* Responsive */
+@media (min-width: 480px) {
+  #app { border-radius: 0; box-shadow: 0 0 60px rgba(0,0,0,0.5); }
+}
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+}
+.empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
+.empty-state p { font-size: 14px; }
+
+/* Listening wave */
+.listen-wave {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  height: 24px;
+  justify-content: center;
+}
+.wave-bar {
+  width: 3px;
+  height: 4px;
+  background: linear-gradient(to top, var(--neon-blue), var(--neon-purple));
+  border-radius: 2px;
+  animation: wave-dance 0.8s ease-in-out infinite;
+}
+.wave-bar:nth-child(2) { animation-delay: 0.1s; }
+.wave-bar:nth-child(3) { animation-delay: 0.2s; height: 16px; }
+.wave-bar:nth-child(4) { animation-delay: 0.3s; }
+.wave-bar:nth-child(5) { animation-delay: 0.4s; }
+@keyframes wave-dance { 0%, 100% { height: 4px; } 50% { height: 20px; } }
+.listen-wave.hidden { display: none; }
+
+/* Pulse dot for speaking */
+.speaking-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--neon-purple);
+  animation: speaking-pulse 0.6s ease-in-out infinite;
+  display: inline-block;
+  box-shadow: 0 0 8px var(--neon-purple);
+}
+@keyframes speaking-pulse { 0%, 100% { transform: scale(1); opacity: 0.7; } 50% { transform: scale(1.5); opacity: 1; } }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ALARM ACTIVE SCREEN -->
+  <div id="alarmActiveScreen" class="alarm-screen hidden">
+    <div class="alarm-bell">🔔</div>
+    <div id="alarmActiveName" class="alarm-name">Alarm</div>
+    <div id="alarmActiveTime" class="alarm-time">--:--</div>
+    <div style="display:flex;gap:12px;margin-top:10px">
+      <button class="btn btn-secondary" style="width:130px" onclick="snoozeAlarm()">⏰ Odloži 5min</button>
+      <button class="btn btn-danger" style="width:130px" onclick="dismissAlarm()">✓ Zatvori</button>
+    </div>
+  </div>
+
+  <!-- HOME SCREEN -->
+  <div id="screenHome" class="screen">
+    <div class="header">
+      <div class="header-top">
+        <div class="avatar-wrap">
+          <div class="avatar-ring"></div>
+          <div class="avatar-img">🤖</div>
+        </div>
+        <div class="agent-info">
+          <div class="agent-name">Luna</div>
+          <div class="agent-sub">Smart AI Sekretarica</div>
+        </div>
+        <div class="header-badges">
+          <div id="aiStatusBadge" class="badge-offline">⚡ Offline</div>
+          <div class="badge-theme" onclick="cycleTheme()" id="themeBtn">🌙</div>
+          <div class="user-badge" onclick="showScreen('screenSettings')">Saša</div>
+          <div class="menu-btn" onclick="showScreen('screenChat')">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+      </div>
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="Pretraži sve..." id="globalSearch" oninput="doSearch(this.value)">
+      </div>
+      <div class="status-bar" id="statusBar">
+        <div class="status-dot" id="statusInternet">Internet</div>
+        <div class="status-dot" id="statusGroq">Groq API</div>
+        <div class="status-dot" id="statusMic">Mikrofon</div>
+        <div class="status-dot" id="statusTTS">Zvučnik</div>
+        <div class="status-dot" id="statusDB">Baza</div>
+      </div>
+    </div>
+
+    <div class="main-scroll">
+      <div class="dash-grid">
+        <div class="dash-card" onclick="showScreen('screenNotes')">
+          <div class="badge-dot" id="notesCount">0</div>
+          <div class="dash-card-icon">📝</div>
+          <div class="dash-card-title">Beleške</div>
+          <div class="dash-card-count" id="notesStat">0</div>
+        </div>
+        <div class="dash-card" onclick="showScreen('screenAlarms')">
+          <div class="badge-dot" id="alarmsCount">0</div>
+          <div class="dash-card-icon">⏰</div>
+          <div class="dash-card-title">Alarmi</div>
+          <div class="dash-card-count" id="alarmsStat">0</div>
+        </div>
+        <div class="dash-card" onclick="showScreen('screenTasks')">
+          <div class="badge-dot" id="tasksCount">0</div>
+          <div class="dash-card-icon">✅</div>
+          <div class="dash-card-title">Zadaci</div>
+          <div class="dash-card-count" id="tasksStat">0</div>
+        </div>
+        <div class="dash-card" onclick="showScreen('screenReminders')">
+          <div class="badge-dot" id="remindersCount">0</div>
+          <div class="dash-card-icon">🔔</div>
+          <div class="dash-card-title">Podsetnici</div>
+          <div class="dash-card-count" id="remindersStat">0</div>
+        </div>
+        <div class="dash-card wide" onclick="showScreen('screenCalendar')">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="dash-card-icon">📅</div>
+            <div>
+              <div class="dash-card-title">Kalendar & Planer</div>
+              <div style="font-size:12px;color:var(--text-secondary);margin-top:2px" id="todayLabel">Danas: učitavam...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Wave separator -->
+      <svg viewBox="0 0 430 40" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="display:block;width:100%;height:40px;margin-top:6px">
+        <defs>
+          <linearGradient id="waveGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--dark-bg)"/>
+            <stop offset="100%" stop-color="var(--light-bg)"/>
+          </linearGradient>
+        </defs>
+        <path d="M0,0 L430,0 L430,15 Q350,38 215,38 Q80,38 0,15 Z" fill="var(--light-bg)"/>
+      </svg>
+
+      <div class="light-section">
+        <div class="section-title">AI Ličnost</div>
+        <div class="personality-row" id="personalityRow">
+          <div class="personality-btn active" data-personality="smart" onclick="setPersonality('smart', this)">
+            <div class="personality-emoji">🧠</div>
+            <div class="personality-label">Pametna</div>
+          </div>
+          <div class="personality-btn" data-personality="funny" onclick="setPersonality('funny', this)">
+            <div class="personality-emoji">😜</div>
+            <div class="personality-label">Šaljiva</div>
+          </div>
+          <div class="personality-btn" data-personality="oracle" onclick="setPersonality('oracle', this)">
+            <div class="personality-emoji">🔮</div>
+            <div class="personality-label">Sveznalica</div>
+          </div>
+          <div class="personality-btn" data-personality="business" onclick="setPersonality('business', this)">
+            <div class="personality-emoji">💼</div>
+            <div class="personality-label">Poslovna</div>
+          </div>
+        </div>
+
+        <div style="margin-top:14px">
+          <div class="section-title">Glasovni Asistent</div>
+          <div class="mic-section">
+            <div class="mic-btn-wrap">
+              <div class="mic-rings" id="micRings">
+                <div class="mic-ring"></div>
+                <div class="mic-ring"></div>
+                <div class="mic-ring"></div>
+              </div>
+              <button class="mic-btn" id="mainMicBtn" onclick="toggleVoiceInput()">
+                <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3zM19 10v2a7 7 0 0 1-14 0v-2H3v2a9 9 0 0 0 8 8.94V23h2v-2.06A9 9 0 0 0 21 12v-2h-2z"/></svg>
+              </button>
+            </div>
+            <div class="listen-wave hidden" id="listenWave">
+              <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+              <div class="wave-bar"></div><div class="wave-bar"></div>
+            </div>
+            <div class="mic-label" id="micLabel">DODIRNI I KAŽI KOMANDU</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom nav -->
+    <div class="bottom-nav">
+      <button class="nav-btn active" onclick="showScreen('screenHome')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span>Dom</span>
+      </button>
+      <button class="nav-btn" onclick="showScreen('screenTasks')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+        <span>Zadaci</span>
+      </button>
+      <button class="nav-btn" onclick="showScreen('screenCalendar')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+        <span>Kalendar</span>
+      </button>
+      <button class="nav-btn" onclick="showScreen('screenChat')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
+        <span>Chat</span>
+      </button>
+      <button class="nav-btn" onclick="showScreen('screenSettings')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.43 12.98c.04-.32.07-.64.07-.98 0-.34-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98 0 .33.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.58 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>
+        <span>Podešavanja</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- NOTES SCREEN -->
+  <div id="screenNotes" class="screen hidden">
+    <div class="sub-header">
+      <div class="back-btn" onclick="goBack()">←</div>
+      <div class="sub-title">📝 Beleške</div>
+      <button class="sub-action" onclick="openModal('addNoteModal')">+</button>
+    </div>
+    <div class="list-scroll" id="notesList"></div>
+  </div>
+
+  <!-- ALARMS SCREEN -->
+  <div id="screenAlarms" class="screen hidden">
+    <div class="sub-header">
+      <div class="back-btn" onclick="goBack()">←</div>
+      <div class="sub-title">⏰ Alarmi</div>
+      <button class="sub-action" onclick="openModal('addAlarmModal')">+</button>
+    </div>
+    <div class="list-scroll" id="alarmsList"></div>
+  </div>
+
+  <!-- TASKS SCREEN -->
+  <div id="screenTasks" class="screen hidden">
+    <div class="sub-header">
+      <div class="back-btn" onclick="goBack()">←</div>
+      <div class="sub-title">✅ Zadaci</div>
+      <button class="sub-action" onclick="openModal('addTaskModal')">+</button>
+    </div>
+    <div class="list-scroll" id="tasksList"></div>
+  </div>
+
+  <!-- REMINDERS SCREEN -->
+  <div id="screenReminders" class="screen hidden">
+    <div class="sub-header">
+      <div class="back-btn" onclick="goBack()">←</div>
+      <div class="sub-title">🔔 Podsetnici</div>
+      <button class="sub-action" onclick="openModal('addReminderModal')">+</button>
+    </div>
+    <div class="list-scroll" id="remindersList"></div>
+  </div>
+
+  <!-- CALENDAR SCREEN -->
+  <div id="screenCalendar" class="screen hidden">
+    <div class="sub-header">
+      <div class="back-btn" onclick="goBack()">←</div>
+      <div class="sub-title">📅 Kalendar</div>
+      <button class="sub-action" onclick="openModal('addEventModal')">+</button>
+    </div>
+    <div class="list-scroll">
+      <div style="background:var(--dark-card);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--shadow-dark);border:1px solid rgba(255,255,255,0.05)">
+        <div class="cal-nav">
+          <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
+          <div class="cal-month" id="calMonthLabel"></div>
+          <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
+        </div>
+        <div class="calendar-grid" id="calDayHeaders"></div>
+        <div class="calendar-grid" id="calGrid"></div>
+      </div>
+      <div id="calEventsList" style="margin-top:4px"></div>
+    </div>
+  </div>
+
+  <!-- CHAT SCREEN -->
+  <div id="screenChat" class="screen hidden">
+    <div class="sub-header">
+      <div class="back-btn" onclick="goBack()">←</div>
+      <div style="display:flex;align-items:center;gap:10px;flex:1">
+        <div style="font-size:24px">🤖</div>
+        <div>
+          <div class="sub-title" style="font-size:16px">Luna AI</div>
+          <div style="font-size:11px;color:var(--text-muted)" id="chatStatusLabel">Inicijalizacija...</div>
+        </div>
+      </div>
+      <div class="listen-wave hidden" id="chatListenWave" style="margin-right:8px">
+        <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+        <div class="wave-bar"></div><div class="wave-bar"></div>
+      </div>
+    </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-row">
+      <button class="chat-mic" id="chatMicBtn" onclick="toggleChatVoice()">
+        <svg viewBox="0 0 24 24" fill="var(--neon-blue)" width="20" height="20"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3zM19 10v2a7 7 0 0 1-14 0v-2H3v2a9 9 0 0 0 8 8.94V23h2v-2.06A9 9 0 0 0 21 12v-2h-2z"/></svg>
+      </button>
+      <textarea class="chat-input" id="chatInput" placeholder="Napiši poruku..." rows="1" onkeydown="chatKeyDown(event)" oninput="autoResize(this)"></textarea>
+      <button class="chat-send" onclick="sendChatMessage()">
+        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- SETTINGS SCREEN -->
+  <div id="screenSettings" class="screen hidden">
+    <div class="sub-header">
+      <div class="back-btn" onclick="goBack()">←</div>
+      <div class="sub-title">⚙️ Podešavanja</div>
+    </div>
+    <div class="list-scroll">
+      <div class="settings-section">
+        <div class="settings-section-title">Tema</div>
+        <div class="settings-card">
+          <div style="padding:12px 0">
+            <div class="theme-row">
+              <div class="theme-opt theme-light" id="themeOptLight" onclick="setTheme('light')">☀️ Light</div>
+              <div class="theme-opt theme-dark active" id="themeOptDark" onclick="setTheme('dark')">🌙 Dark</div>
+              <div class="theme-opt theme-amoled" id="themeOptAmoled" onclick="setTheme('amoled')">⚫ AMOLED</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Groq AI API</div>
+        <div class="settings-card">
+          <div style="padding:12px 0">
+            <div class="input-group">
+              <div class="input-label">Groq API Ključ</div>
+              <input type="password" class="input-field" id="groqApiKeyInput" placeholder="gsk_..." oninput="saveGroqKey()">
+            </div>
+            <div class="btn-row">
+              <button class="btn btn-secondary" onclick="testGroqConnection()" id="testGroqBtn">🔗 Test</button>
+              <button class="btn btn-primary" onclick="saveGroqKey()">💾 Sačuvaj</button>
+            </div>
+            <div id="groqTestResult" style="margin-top:8px;font-size:12px;text-align:center"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Korisnička Podešavanja</div>
+        <div class="settings-card">
+          <div style="padding:12px 0">
+            <div class="input-group">
+              <div class="input-label">Vaše ime</div>
+              <input type="text" class="input-field" id="userNameInput" placeholder="Saša" oninput="saveUserName()">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">3D Dizajn Efekti</div>
+        <div class="settings-card">
+          <div style="padding:12px 0">
+            <div class="slider-row">
+              <div class="slider-label-row"><span class="slider-label">3D Dubina</span><span class="slider-val" id="val3d">1.0</span></div>
+              <input type="range" min="0" max="2" step="0.1" value="1" id="slider3d" oninput="update3D()">
+            </div>
+            <div class="slider-row">
+              <div class="slider-label-row"><span class="slider-label">Glow Intenzitet</span><span class="slider-val" id="valGlow">1.0</span></div>
+              <input type="range" min="0" max="3" step="0.1" value="1" id="sliderGlow" oninput="updateGlow()">
+            </div>
+            <div class="slider-row">
+              <div class="slider-label-row"><span class="slider-label">Staklasti Efekat</span><span class="slider-val" id="valGlass">1.0</span></div>
+              <input type="range" min="0" max="3" step="0.1" value="1" id="sliderGlass" oninput="updateGlass()">
+            </div>
+            <div class="slider-row">
+              <div class="slider-label-row"><span class="slider-label">Radius Uglova</span><span class="slider-val" id="valRadius">1.0</span></div>
+              <input type="range" min="0.2" max="2" step="0.1" value="1" id="sliderRadius" oninput="updateRadius()">
+            </div>
+            <div class="slider-row">
+              <div class="slider-label-row"><span class="slider-label">Intenzitet Senki</span><span class="slider-val" id="valShadow">1.0</span></div>
+              <input type="range" min="0" max="2" step="0.1" value="1" id="sliderShadow" oninput="updateShadow()">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Glasovne Funkcije</div>
+        <div class="settings-card">
+          <div class="toggle-row">
+            <div><div class="toggle-label">Glasovni Pozdrav</div><div class="toggle-sub">Luna pozdravlja pri pokretanju</div></div>
+            <div class="toggle on" id="toggleGreeting" onclick="toggleSetting('greeting', this)"></div>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">Glasovni Odgovori</div><div class="toggle-sub">Luna govori odgovore</div></div>
+            <div class="toggle on" id="toggleTTS" onclick="toggleSetting('tts', this)"></div>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">Glasovne Notifikacije</div><div class="toggle-sub">Alarmi i podsetnici glasom</div></div>
+            <div class="toggle on" id="toggleVoiceNotif" onclick="toggleSetting('voiceNotif', this)"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Podaci</div>
+        <div class="settings-card">
+          <div style="padding:12px 0">
+            <div class="btn-row" style="margin-bottom:10px">
+              <button class="btn btn-secondary" onclick="exportData()">📤 Export</button>
+              <button class="btn btn-secondary" onclick="importData()">📥 Import</button>
+            </div>
+            <button class="btn btn-danger" onclick="confirmClearData()">🗑️ Obriši sve podatke</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Status Sistema</div>
+        <div class="settings-card">
+          <div style="padding:12px 0;display:flex;flex-wrap:wrap;gap:8px" id="fullStatusPanel"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODALS -->
+
+  <!-- Add Note Modal -->
+  <div class="modal-overlay hidden" id="addNoteModal">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title" id="noteModalTitle">Nova Beleška</div>
+      <input type="hidden" id="editNoteId">
+      <div class="input-group">
+        <div class="input-label">Naslov</div>
+        <input type="text" class="input-field" id="noteTitle" placeholder="Naslov beleške...">
+      </div>
+      <div class="input-group">
+        <div class="input-label">Sadržaj</div>
+        <textarea class="input-field" id="noteContent" placeholder="Napiši belešku..." rows="4"></textarea>
+      </div>
+      <div class="input-group">
+        <div class="input-label">Podsetnik (opciono)</div>
+        <input type="datetime-local" class="input-field" id="noteReminder">
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="closeModal('addNoteModal')">Otkaži</button>
+        <button class="btn btn-primary" onclick="saveNote()">💾 Sačuvaj</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Alarm Modal -->
+  <div class="modal-overlay hidden" id="addAlarmModal">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title" id="alarmModalTitle">Novi Alarm</div>
+      <input type="hidden" id="editAlarmId">
+      <div class="input-group">
+        <div class="input-label">Naziv alarma</div>
+        <input type="text" class="input-field" id="alarmLabel" placeholder="Npr. Jutarnji alarm...">
+      </div>
+      <div class="input-group">
+        <div class="input-label">Vreme</div>
+        <input type="time" class="input-field" id="alarmTime" value="07:00">
+      </div>
+      <div class="input-group">
+        <div class="input-label">Ponavljanje</div>
+        <select class="input-field" id="alarmRepeat">
+          <option value="once">Jednom</option>
+          <option value="daily">Svaki dan</option>
+          <option value="weekdays">Radni dani</option>
+          <option value="weekends">Vikend</option>
+        </select>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="closeModal('addAlarmModal')">Otkaži</button>
+        <button class="btn btn-primary" onclick="saveAlarm()">⏰ Postavi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Task Modal -->
+  <div class="modal-overlay hidden" id="addTaskModal">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title" id="taskModalTitle">Novi Zadatak</div>
+      <input type="hidden" id="editTaskId">
+      <div class="input-group">
+        <div class="input-label">Zadatak</div>
+        <input type="text" class="input-field" id="taskTitle" placeholder="Opis zadatka...">
+      </div>
+      <div class="input-group">
+        <div class="input-label">Napomena</div>
+        <textarea class="input-field" id="taskNote" placeholder="Detalji..." rows="2"></textarea>
+      </div>
+      <div class="input-group">
+        <div class="input-label">Rok</div>
+        <input type="datetime-local" class="input-field" id="taskDeadline">
+      </div>
+      <div class="input-group">
+        <div class="input-label">Prioritet</div>
+        <div class="priority-select" id="taskPrioritySelect">
+          <div class="priority-opt high selected" onclick="selectPriority('high')">🔴 Visok</div>
+          <div class="priority-opt medium" onclick="selectPriority('medium')">🟡 Srednji</div>
+          <div class="priority-opt low" onclick="selectPriority('low')">🟢 Nizak</div>
+        </div>
+        <input type="hidden" id="taskPriority" value="high">
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="closeModal('addTaskModal')">Otkaži</button>
+        <button class="btn btn-primary" onclick="saveTask()">✅ Sačuvaj</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Reminder Modal -->
+  <div class="modal-overlay hidden" id="addReminderModal">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title" id="reminderModalTitle">Novi Podsetnik</div>
+      <input type="hidden" id="editReminderId">
+      <div class="input-group">
+        <div class="input-label">Naslov</div>
+        <input type="text" class="input-field" id="reminderTitle" placeholder="Npr. Kupi mleko...">
+      </div>
+      <div class="input-group">
+        <div class="input-label">Sadržaj</div>
+        <textarea class="input-field" id="reminderContent" placeholder="Detalji podsetnika..." rows="2"></textarea>
+      </div>
+      <div class="input-group">
+        <div class="input-label">Datum i vreme</div>
+        <input type="datetime-local" class="input-field" id="reminderDateTime">
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="closeModal('addReminderModal')">Otkaži</button>
+        <button class="btn btn-primary" onclick="saveReminder()">🔔 Postavi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Event Modal -->
+  <div class="modal-overlay hidden" id="addEventModal">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Novi Događaj</div>
+      <div class="input-group">
+        <div class="input-label">Naslov</div>
+        <input type="text" class="input-field" id="eventTitle" placeholder="Naziv događaja...">
+      </div>
+      <div class="input-group">
+        <div class="input-label">Datum i vreme</div>
+        <input type="datetime-local" class="input-field" id="eventDateTime">
+      </div>
+      <div class="input-group">
+        <div class="input-label">Opis</div>
+        <textarea class="input-field" id="eventDesc" placeholder="Opis..." rows="2"></textarea>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="closeModal('addEventModal')">Otkaži</button>
+        <button class="btn btn-primary" onclick="saveEvent()">📅 Sačuvaj</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ==========================================
+// STATE
+// ==========================================
+let db;
+let currentScreen = 'screenHome';
+let screenHistory = ['screenHome'];
+let recognition = null;
+let synth = window.speechSynthesis;
+let isListening = false;
+let isSpeaking = false;
+let currentPersonality = 'smart';
+let groqApiKey = '';
+let userName = 'Saša';
+let isOnline = navigator.onLine;
+let groqAvailable = false;
+let alarmCheckInterval = null;
+let calDate = new Date();
+let settings = { greeting: true, tts: true, voiceNotif: true };
+let activeAlarm = null;
+let alarmAudio = null;
+let chatHistory = [];
+
+const PERSONALITIES = {
+  smart: { name: 'Pametna', prompt: 'Ti si Luna, pametna i efikasna AI sekretarica. Odgovaraj precizno, korisno i stručno na srpskom jeziku.' },
+  funny: { name: 'Šaljiva', prompt: 'Ti si Luna, šaljiva i opuštena AI sekretarica. Odgovaraj sa humorom, ali i korisno, na srpskom jeziku. Koristi emoji.' },
+  oracle: { name: 'Sveznalica', prompt: 'Ti si Luna, mudra i tajnovita AI sekretarica. Odgovaraj duboko i filozofski na srpskom jeziku, kao da znaš sve.' },
+  business: { name: 'Poslovna', prompt: 'Ti si Luna, profesionalna i efikasna AI sekretarica. Odgovaraj formalno, kratko i precizno na srpskom jeziku.' },
+  friendly: { name: 'Prijateljska', prompt: 'Ti si Luna, topla i prijateljska AI sekretarica. Odgovaraj srdačno i empatično na srpskom jeziku.' }
+};
+
+// ==========================================
+// IndexedDB
+// ==========================================
+function initDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open('LunaAI', 2);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      ['notes','alarms','tasks','reminders','events','settings'].forEach(store => {
+        if (!db.objectStoreNames.contains(store)) {
+          db.createObjectStore(store, { keyPath: 'id' });
+        }
+      });
+    };
+    req.onsuccess = (e) => { db = e.target.result; resolve(db); };
+    req.onerror = reject;
+  });
+}
+
+function dbGet(store, id) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(store, 'readonly');
+    const req = id ? tx.objectStore(store).get(id) : tx.objectStore(store).getAll();
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = reject;
+  });
+}
+
+function dbPut(store, data) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(store, 'readwrite');
+    const req = tx.objectStore(store).put(data);
+    req.onsuccess = resolve;
+    req.onerror = reject;
+  });
+}
+
+function dbDelete(store, id) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(store, 'readwrite');
+    const req = tx.objectStore(store).delete(id);
+    req.onsuccess = resolve;
+    req.onerror = reject;
+  });
+}
+
+// ==========================================
+// SCREEN NAVIGATION
+// ==========================================
+function showScreen(id, skipHistory = false) {
+  if (currentScreen === id) return;
+  const prev = document.getElementById(currentScreen);
+  const next = document.getElementById(id);
+  if (!next) return;
+
+  prev.classList.add('slide-left');
+  prev.classList.remove('hidden');
+  next.classList.remove('hidden', 'slide-left');
+
+  if (!skipHistory) screenHistory.push(id);
+  currentScreen = id;
+
+  setTimeout(() => {
+    prev.classList.add('hidden');
+    prev.classList.remove('slide-left');
+  }, 360);
+
+  onScreenEnter(id);
+}
+
+function goBack() {
+  if (screenHistory.length > 1) {
+    screenHistory.pop();
+    const prev = screenHistory[screenHistory.length - 1];
+    const cur = document.getElementById(currentScreen);
+    const target = document.getElementById(prev);
+
+    cur.classList.add('hidden');
+    target.classList.remove('hidden', 'hidden', 'slide-left');
+    currentScreen = prev;
+    onScreenEnter(prev);
+  }
+}
+
+function onScreenEnter(id) {
+  switch(id) {
+    case 'screenHome': refreshDashboard(); break;
+    case 'screenNotes': renderNotes(); break;
+    case 'screenAlarms': renderAlarms(); break;
+    case 'screenTasks': renderTasks(); break;
+    case 'screenReminders': renderReminders(); break;
+    case 'screenCalendar': renderCalendar(); break;
+    case 'screenSettings': loadSettings(); break;
+    case 'screenChat': updateChatStatus(); break;
+  }
+}
+
+// ==========================================
+// MODALS
+// ==========================================
+function openModal(id) {
+  const m = document.getElementById(id);
+  m.classList.remove('hidden');
+  // Clear form
+  m.querySelectorAll('input:not([type=hidden]):not([type=range]), textarea, select').forEach(el => {
+    if (el.type !== 'datetime-local' && el.type !== 'time' && el.tagName !== 'SELECT') {
+      el.value = '';
+    }
+  });
+  const editId = m.querySelector('input[type=hidden]');
+  if (editId) editId.value = '';
+
+  // Reset priority
+  if (id === 'addTaskModal') {
+    selectPriority('high');
+    document.getElementById('taskModalTitle').textContent = 'Novi Zadatak';
+  }
+  if (id === 'addNoteModal') document.getElementById('noteModalTitle').textContent = 'Nova Beleška';
+  if (id === 'addAlarmModal') document.getElementById('alarmModalTitle').textContent = 'Novi Alarm';
+  if (id === 'addReminderModal') document.getElementById('reminderModalTitle').textContent = 'Novi Podsetnik';
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.add('hidden');
+}
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.classList.add('hidden');
+  });
+});
+
+// ==========================================
+// NOTES
+// ==========================================
+async function saveNote() {
+  const id = document.getElementById('editNoteId').value || Date.now().toString();
+  const title = document.getElementById('noteTitle').value.trim();
+  const content = document.getElementById('noteContent').value.trim();
+  const reminder = document.getElementById('noteReminder').value;
+
+  if (!title && !content) { showToast('Unesite naslov ili sadržaj'); return; }
+
+  await dbPut('notes', { id, title: title || 'Bez naslova', content, reminder, created: Date.now() });
+  closeModal('addNoteModal');
+  renderNotes();
+  refreshDashboard();
+  showToast('✅ Beleška sačuvana');
+}
+
+async function renderNotes(filter = '') {
+  const list = document.getElementById('notesList');
+  const notes = await dbGet('notes');
+  const filtered = filter ? notes.filter(n => n.title.toLowerCase().includes(filter) || n.content.toLowerCase().includes(filter)) : notes;
+  filtered.sort((a, b) => b.created - a.created);
+
+  if (!filtered.length) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">📝</div><p>Nema beleški. Dodajte prvu!</p></div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(n => `
+    <div class="list-item" onclick="editNote('${n.id}')">
+      <div class="item-icon">📝</div>
+      <div class="item-body">
+        <div class="item-title">${escHtml(n.title)}</div>
+        <div class="item-sub">${escHtml(n.content.substring(0, 60))}${n.content.length > 60 ? '...' : ''}</div>
+        <div class="item-meta">
+          <span class="tag">${formatDate(n.created)}</span>
+          ${n.reminder ? `<span class="tag">🔔 ${formatDateTime(n.reminder)}</span>` : ''}
+        </div>
+      </div>
+      <div class="item-actions">
+        <button class="item-btn" onclick="event.stopPropagation();speakNote('${n.id}')">🔊</button>
+        <button class="item-btn delete" onclick="event.stopPropagation();deleteItem('notes','${n.id}',renderNotes)">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function editNote(id) {
+  const note = await dbGet('notes', id);
+  if (!note) return;
+  document.getElementById('editNoteId').value = note.id;
+  document.getElementById('noteTitle').value = note.title;
+  document.getElementById('noteContent').value = note.content;
+  document.getElementById('noteReminder').value = note.reminder || '';
+  document.getElementById('noteModalTitle').textContent = 'Uredi Belešku';
+  document.getElementById('addNoteModal').classList.remove('hidden');
+}
+
+async function speakNote(id) {
+  const note = await dbGet('notes', id);
+  if (note) speak(`${note.title}. ${note.content}`);
+}
+
+// ==========================================
+// ALARMS
+// ==========================================
+async function saveAlarm() {
+  const id = document.getElementById('editAlarmId').value || Date.now().toString();
+  const label = document.getElementById('alarmLabel').value.trim() || 'Alarm';
+  const time = document.getElementById('alarmTime').value;
+  const repeat = document.getElementById('alarmRepeat').value;
+
+  if (!time) { showToast('Unesite vreme'); return; }
+
+  await dbPut('alarms', { id, label, time, repeat, active: true, created: Date.now() });
+  closeModal('addAlarmModal');
+  renderAlarms();
+  refreshDashboard();
+  showToast(`⏰ Alarm postavljen: ${time}`);
+}
+
+async function renderAlarms() {
+  const list = document.getElementById('alarmsList');
+  const alarms = await dbGet('alarms');
+  alarms.sort((a, b) => a.time.localeCompare(b.time));
+
+  if (!alarms.length) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">⏰</div><p>Nema alarma. Postavite prvi!</p></div>';
+    return;
+  }
+
+  list.innerHTML = alarms.map(a => `
+    <div class="list-item">
+      <div class="item-icon">${a.active ? '⏰' : '🔕'}</div>
+      <div class="item-body">
+        <div class="item-title">${escHtml(a.label)}</div>
+        <div class="item-sub" style="font-size:22px;font-weight:700;color:var(--text-primary)">${a.time}</div>
+        <div class="item-meta"><span class="tag">${repeatLabel(a.repeat)}</span>${a.active ? '<span class="tag done">Aktivan</span>' : '<span class="tag urgent">Neaktivan</span>'}</div>
+      </div>
+      <div class="item-actions">
+        <div class="toggle ${a.active ? 'on' : ''}" onclick="toggleAlarm('${a.id}')"></div>
+        <button class="item-btn delete" onclick="deleteItem('alarms','${a.id}',renderAlarms)">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function toggleAlarm(id) {
+  const alarm = await dbGet('alarms', id);
+  if (alarm) {
+    alarm.active = !alarm.active;
+    await dbPut('alarms', alarm);
+    renderAlarms();
+    showToast(alarm.active ? '⏰ Alarm aktiviran' : '🔕 Alarm deaktiviran');
+  }
+}
+
+function repeatLabel(r) {
+  const m = { once: 'Jednom', daily: 'Svaki dan', weekdays: 'Radni dani', weekends: 'Vikend' };
+  return m[r] || r;
+}
+
+// ==========================================
+// TASKS
+// ==========================================
+function selectPriority(p) {
+  document.querySelectorAll('.priority-opt').forEach(el => el.classList.remove('selected'));
+  document.querySelector(`.priority-opt.${p}`).classList.add('selected');
+  document.getElementById('taskPriority').value = p;
+}
+
+async function saveTask() {
+  const id = document.getElementById('editTaskId').value || Date.now().toString();
+  const title = document.getElementById('taskTitle').value.trim();
+  if (!title) { showToast('Unesite zadatak'); return; }
+
+  await dbPut('tasks', {
+    id,
+    title,
+    note: document.getElementById('taskNote').value.trim(),
+    deadline: document.getElementById('taskDeadline').value,
+    priority: document.getElementById('taskPriority').value,
+    done: false,
+    created: Date.now()
+  });
+  closeModal('addTaskModal');
+  renderTasks();
+  refreshDashboard();
+  showToast('✅ Zadatak sačuvan');
+}
+
+async function renderTasks() {
+  const list = document.getElementById('tasksList');
+  const tasks = await dbGet('tasks');
+  const sorted = [...tasks].sort((a, b) => {
+    if (a.done !== b.done) return a.done ? 1 : -1;
+    const pMap = { high: 0, medium: 1, low: 2 };
+    return (pMap[a.priority] || 1) - (pMap[b.priority] || 1);
+  });
+
+  if (!sorted.length) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">✅</div><p>Nema zadataka. Dodajte prvi!</p></div>';
+    return;
+  }
+
+  list.innerHTML = sorted.map(t => `
+    <div class="list-item ${t.done ? 'done' : ''}">
+      <div class="priority-bar ${t.priority}"></div>
+      <div class="item-icon" onclick="toggleTask('${t.id}')" style="cursor:pointer">${t.done ? '✅' : '⬜'}</div>
+      <div class="item-body">
+        <div class="item-title">${escHtml(t.title)}</div>
+        ${t.note ? `<div class="item-sub">${escHtml(t.note)}</div>` : ''}
+        <div class="item-meta">
+          <span class="tag ${t.priority === 'high' ? 'urgent' : t.priority === 'low' ? 'done' : ''}">${priorityLabel(t.priority)}</span>
+          ${t.deadline ? `<span class="tag">📅 ${formatDateTime(t.deadline)}</span>` : ''}
+        </div>
+      </div>
+      <div class="item-actions">
+        <button class="item-btn delete" onclick="deleteItem('tasks','${t.id}',renderTasks)">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function toggleTask(id) {
+  const task = await dbGet('tasks', id);
+  if (task) {
+    task.done = !task.done;
+    await dbPut('tasks', task);
+    renderTasks();
+    refreshDashboard();
+  }
+}
+
+function priorityLabel(p) {
+  return { high: '🔴 Visok', medium: '🟡 Srednji', low: '🟢 Nizak' }[p] || p;
+}
+
+// ==========================================
+// REMINDERS
+// ==========================================
+async function saveReminder() {
+  const id = document.getElementById('editReminderId').value || Date.now().toString();
+  const title = document.getElementById('reminderTitle').value.trim();
+  if (!title) { showToast('Unesite naslov'); return; }
+
+  await dbPut('reminders', {
+    id, title,
+    content: document.getElementById('reminderContent').value.trim(),
+    datetime: document.getElementById('reminderDateTime').value,
+    fired: false,
+    created: Date.now()
+  });
+  closeModal('addReminderModal');
+  renderReminders();
+  refreshDashboard();
+  showToast('🔔 Podsetnik postavljen');
+}
+
+async function renderReminders() {
+  const list = document.getElementById('remindersList');
+  const reminders = await dbGet('reminders');
+  reminders.sort((a, b) => {
+    if (!a.datetime) return 1;
+    if (!b.datetime) return -1;
+    return new Date(a.datetime) - new Date(b.datetime);
+  });
+
+  if (!reminders.length) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">🔔</div><p>Nema podsetnika. Dodajte prvi!</p></div>';
+    return;
+  }
+
+  list.innerHTML = reminders.map(r => `
+    <div class="list-item ${r.fired ? 'done' : ''}">
+      <div class="item-icon">🔔</div>
+      <div class="item-body">
+        <div class="item-title">${escHtml(r.title)}</div>
+        ${r.content ? `<div class="item-sub">${escHtml(r.content)}</div>` : ''}
+        <div class="item-meta">
+          ${r.datetime ? `<span class="tag">📅 ${formatDateTime(r.datetime)}</span>` : ''}
+          ${r.fired ? '<span class="tag done">Okinut</span>' : ''}
+        </div>
+      </div>
+      <div class="item-actions">
+        <button class="item-btn" onclick="speakReminder('${r.id}')">🔊</button>
+        <button class="item-btn delete" onclick="deleteItem('reminders','${r.id}',renderReminders)">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function speakReminder(id) {
+  const r = await dbGet('reminders', id);
+  if (r) speak(`${userName}, podsetnik: ${r.title}. ${r.content}`);
+}
+
+// ==========================================
+// EVENTS / CALENDAR
+// ==========================================
+async function saveEvent() {
+  const id = Date.now().toString();
+  const title = document.getElementById('eventTitle').value.trim();
+  if (!title) { showToast('Unesite naslov'); return; }
+
+  await dbPut('events', {
+    id, title,
+    datetime: document.getElementById('eventDateTime').value,
+    desc: document.getElementById('eventDesc').value.trim(),
+    created: Date.now()
+  });
+  closeModal('addEventModal');
+  renderCalendar();
+  showToast('📅 Događaj sačuvan');
+}
+
+async function renderCalendar() {
+  const headers = document.getElementById('calDayHeaders');
+  const grid = document.getElementById('calGrid');
+  const label = document.getElementById('calMonthLabel');
+
+  const days = ['Ned', 'Pon', 'Uto', 'Sre', 'Čet', 'Pet', 'Sub'];
+  headers.innerHTML = days.map(d => `<div class="cal-day-header">${d}</div>`).join('');
+
+  const year = calDate.getFullYear();
+  const month = calDate.getMonth();
+  const months = ['Januar','Februar','Mart','April','Maj','Jun','Jul','Avgust','Septembar','Oktobar','Novembar','Decembar'];
+  label.textContent = `${months[month]} ${year}`;
+
+  const events = await dbGet('events');
+  const eventDates = new Set(events.filter(e => e.datetime).map(e => e.datetime.substring(0, 10)));
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const today = new Date();
+
+  let html = '';
+  for (let i = 0; i < firstDay; i++) {
+    const d = new Date(year, month, -firstDay + i + 1).getDate();
+    html += `<div class="cal-day other-month">${d}</div>`;
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = today.getFullYear() === year && today.getMonth() === month && today.getDate() === d;
+    const hasEvent = eventDates.has(dateStr);
+    html += `<div class="cal-day ${isToday ? 'today' : ''} ${hasEvent ? 'has-event' : ''}" onclick="selectCalDay('${dateStr}')">${d}</div>`;
+  }
+  grid.innerHTML = html;
+
+  // Show today's events
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+  const todayEvents = events.filter(e => e.datetime && e.datetime.startsWith(todayStr));
+  const evList = document.getElementById('calEventsList');
+  if (todayEvents.length) {
+    evList.innerHTML = `<div class="section-title" style="padding:0 4px 8px">Danas</div>` + todayEvents.map(e => `
+      <div class="list-item">
+        <div class="item-icon">📅</div>
+        <div class="item-body">
+          <div class="item-title">${escHtml(e.title)}</div>
+          <div class="item-sub">${e.datetime ? formatDateTime(e.datetime) : ''}</div>
+        </div>
+        <button class="item-btn delete" onclick="deleteItem('events','${e.id}',renderCalendar)">🗑️</button>
+      </div>
+    `).join('');
+  } else {
+    evList.innerHTML = '<div class="empty-state" style="padding:20px"><p>Nema događaja danas</p></div>';
+  }
+}
+
+function changeMonth(dir) {
+  calDate.setMonth(calDate.getMonth() + dir);
+  renderCalendar();
+}
+
+async function selectCalDay(dateStr) {
+  const events = await dbGet('events');
+  const dayEvents = events.filter(e => e.datetime && e.datetime.startsWith(dateStr));
+  const evList = document.getElementById('calEventsList');
+  if (dayEvents.length) {
+    evList.innerHTML = `<div class="section-title" style="padding:0 4px 8px">${dateStr}</div>` + dayEvents.map(e => `
+      <div class="list-item">
+        <div class="item-icon">📅</div>
+        <div class="item-body">
+          <div class="item-title">${escHtml(e.title)}</div>
+          <div class="item-sub">${e.desc || ''}</div>
+        </div>
+        <button class="item-btn delete" onclick="deleteItem('events','${e.id}',renderCalendar)">🗑️</button>
+      </div>
+    `).join('');
+  } else {
+    evList.innerHTML = `<div class="empty-state" style="padding:20px"><p>Nema događaja za ${dateStr}</p></div>`;
+  }
+}
+
+// ==========================================
+// DASHBOARD
+// ==========================================
+async function refreshDashboard() {
+  const [notes, alarms, tasks, reminders] = await Promise.all([
+    dbGet('notes'), dbGet('alarms'), dbGet('tasks'), dbGet('reminders')
+  ]);
+  const activeTasks = tasks.filter(t => !t.done).length;
+  const activeAlarms = alarms.filter(a => a.active).length;
+  const activeReminders = reminders.filter(r => !r.fired).length;
+
+  document.getElementById('notesCount').textContent = notes.length;
+  document.getElementById('alarmsCount').textContent = activeAlarms;
+  document.getElementById('tasksCount').textContent = activeTasks;
+  document.getElementById('remindersCount').textContent = activeReminders;
+  document.getElementById('notesStat').textContent = notes.length;
+  document.getElementById('alarmsStat').textContent = activeAlarms;
+  document.getElementById('tasksStat').textContent = activeTasks;
+  document.getElementById('remindersStat').textContent = activeReminders;
+
+  const today = new Date();
+  const days = ['Nedjelja','Ponedeljak','Utorak','Srijeda','Četvrtak','Petak','Subota'];
+  document.getElementById('todayLabel').textContent = `${days[today.getDay()]}, ${today.getDate()}.${today.getMonth()+1}.${today.getFullYear()}`;
+}
+
+// ==========================================
+// DELETE UTILITY
+// ==========================================
+async function deleteItem(store, id, refreshFn) {
+  await dbDelete(store, id);
+  if (refreshFn) refreshFn();
+  refreshDashboard();
+  showToast('🗑️ Obrisano');
+}
+
+// ==========================================
+// ALARM CHECKER
+// ==========================================
+function startAlarmChecker() {
+  alarmCheckInterval = setInterval(async () => {
+    if (!db) return;
+    const now = new Date();
+    const timeStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+    // Check alarms
+    const alarms = await dbGet('alarms');
+    for (const alarm of alarms) {
+      if (!alarm.active) continue;
+      if (alarm.time === timeStr && now.getSeconds() < 5) {
+        if (!activeAlarm) triggerAlarm(alarm);
+      }
+    }
+
+    // Check reminders
+    const reminders = await dbGet('reminders');
+    for (const r of reminders) {
+      if (r.fired || !r.datetime) continue;
+      const rDate = new Date(r.datetime);
+      if (Math.abs(now - rDate) < 30000) {
+        r.fired = true;
+        await dbPut('reminders', r);
+        const text = `${userName}, podsetnik: ${r.title}. ${r.content || ''}`;
+        if (settings.voiceNotif) speak(text);
+        showToast(`🔔 ${r.title}`);
+        sendNotification(r.title, r.content || 'Podsetnik');
+        if (currentScreen === 'screenReminders') renderReminders();
+      }
+    }
+
+    // Check note reminders
+    const notes = await dbGet('notes');
+    for (const n of notes) {
+      if (!n.reminder || n.reminderFired) continue;
+      const rDate = new Date(n.reminder);
+      if (Math.abs(now - rDate) < 30000) {
+        n.reminderFired = true;
+        await dbPut('notes', n);
+        const text = `${userName}, podsetnik iz beleške: ${n.title}. ${n.content || ''}`;
+        if (settings.voiceNotif) speak(text);
+        showToast(`📝 ${n.title}`);
+      }
+    }
+  }, 5000);
+}
+
+function triggerAlarm(alarm) {
+  activeAlarm = alarm;
+  document.getElementById('alarmActiveName').textContent = alarm.label;
+  document.getElementById('alarmActiveTime').textContent = alarm.time;
+  document.getElementById('alarmActiveScreen').classList.remove('hidden');
+
+  // Play alarm sound via oscillator
+  playAlarmSound();
+
+  if (settings.voiceNotif) {
+    setTimeout(() => speak(`${userName}, alarm: ${alarm.label}`), 1000);
+  }
+  sendNotification(`Alarm: ${alarm.label}`, alarm.time);
+}
+
+function playAlarmSound() {
+  try {
+    const ctx = new AudioContext();
+    const oscillator = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+    oscillator.connect(gainNode);
+    gainNode.connect(ctx.destination);
+    oscillator.frequency.setValueAtTime(880, ctx.currentTime);
+    oscillator.frequency.setValueAtTime(660, ctx.currentTime + 0.5);
+    gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 2);
+    oscillator.start(ctx.currentTime);
+    oscillator.stop(ctx.currentTime + 2);
+
+    // Repeat
+    alarmAudio = setInterval(() => {
+      try {
+        const c = new AudioContext();
+        const o = c.createOscillator();
+        const g = c.createGain();
+        o.connect(g); g.connect(c.destination);
+        o.frequency.setValueAtTime(880, c.currentTime);
+        o.frequency.setValueAtTime(660, c.currentTime + 0.5);
+        g.gain.setValueAtTime(0.3, c.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 2);
+        o.start(c.currentTime); o.stop(c.currentTime + 2);
+      } catch(e){}
+    }, 3000);
+  } catch(e){}
+}
+
+function dismissAlarm() {
+  document.getElementById('alarmActiveScreen').classList.add('hidden');
+  if (alarmAudio) { clearInterval(alarmAudio); alarmAudio = null; }
+  if (activeAlarm) {
+    if (activeAlarm.repeat === 'once') {
+      activeAlarm.active = false;
+      dbPut('alarms', activeAlarm);
+    }
+    speak(`Alarm ${activeAlarm.label} je ugašen`);
+    activeAlarm = null;
+  }
+}
+
+function snoozeAlarm() {
+  if (alarmAudio) { clearInterval(alarmAudio); alarmAudio = null; }
+  document.getElementById('alarmActiveScreen').classList.add('hidden');
+  const alarm = activeAlarm;
+  activeAlarm = null;
+  speak('Alarm je odložen za 5 minuta');
+  setTimeout(() => {
+    if (alarm) triggerAlarm(alarm);
+  }, 5 * 60 * 1000);
+}
+
+// ==========================================
+// VOICE / TTS / STT
+// ==========================================
+function speak(text, onEnd) {
+  if (!settings.tts || !synth) return;
+  synth.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = 'sr-RS';
+  utt.rate = 0.95;
+  utt.pitch = 1.1;
+
+  // Try to find a good voice
+  const voices = synth.getVoices();
+  const srVoice = voices.find(v => v.lang.startsWith('sr')) ||
+                  voices.find(v => v.lang.startsWith('hr')) ||
+                  voices.find(v => v.lang.startsWith('bs')) ||
+                  voices.find(v => v.lang.startsWith('en'));
+  if (srVoice) utt.voice = srVoice;
+
+  isSpeaking = true;
+  utt.onend = () => { isSpeaking = false; if (onEnd) onEnd(); };
+  utt.onerror = () => { isSpeaking = false; if (onEnd) onEnd(); };
+  synth.speak(utt);
+}
+
+function initSpeechRecognition() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return null;
+
+  const rec = new SR();
+  rec.continuous = false;
+  rec.interimResults = false;
+  rec.lang = 'sr-RS';
+
+  rec.onstart = () => {
+    isListening = true;
+    document.getElementById('mainMicBtn').classList.add('listening');
+    document.getElementById('micLabel').textContent = 'SLUŠAM...';
+    document.getElementById('listenWave').classList.remove('hidden');
+    document.getElementById('micRings').querySelectorAll('.mic-ring').forEach(r => r.style.animationPlayState = 'running');
+  };
+
+  rec.onend = () => {
+    isListening = false;
+    document.getElementById('mainMicBtn').classList.remove('listening');
+    document.getElementById('micLabel').textContent = 'DODIRNI I KAŽI KOMANDU';
+    document.getElementById('listenWave').classList.add('hidden');
+  };
+
+  rec.onresult = (e) => {
+    const text = e.results[0][0].transcript;
+    processVoiceCommand(text);
+  };
+
+  rec.onerror = (e) => {
+    isListening = false;
+    document.getElementById('mainMicBtn').classList.remove('listening');
+    document.getElementById('micLabel').textContent = 'DODIRNI I KAŽI KOMANDU';
+    document.getElementById('listenWave').classList.add('hidden');
+    if (e.error !== 'no-speech') showToast('Greška mikrofona: ' + e.error);
+  };
+
+  return rec;
+}
+
+function toggleVoiceInput() {
+  if (!recognition) {
+    recognition = initSpeechRecognition();
+    if (!recognition) { showToast('Speech recognition nije podržan'); return; }
+  }
+
+  if (isListening) {
+    recognition.stop();
+  } else {
+    try { recognition.start(); } catch(e) { recognition = initSpeechRecognition(); try { recognition.start(); } catch(e2) {} }
+  }
+}
+
+async function processVoiceCommand(text) {
+  const lower = text.toLowerCase();
+  showToast(`🎤 "${text}"`);
+
+  // Navigation commands
+  if (lower.includes('beleške') || lower.includes('belešku')) { showScreen('screenNotes'); speak('Otvaranje beleški'); return; }
+  if (lower.includes('alarm') || lower.includes('alarme')) { showScreen('screenAlarms'); speak('Otvaranje alarma'); return; }
+  if (lower.includes('zadatak') || lower.includes('zadatke')) { showScreen('screenTasks'); speak('Otvaranje zadataka'); return; }
+  if (lower.includes('podsetnik') || lower.includes('podsetnike')) { showScreen('screenReminders'); speak('Otvaranje podsetnika'); return; }
+  if (lower.includes('kalendar')) { showScreen('screenCalendar'); speak('Otvaranje kalendara'); return; }
+  if (lower.includes('podešavanja')) { showScreen('screenSettings'); speak('Otvaranje podešavanja'); return; }
+
+  // Home
+  if (lower.includes('početna') || lower.includes('dom') || lower.includes('početak')) {
+    showScreen('screenHome'); speak('Idemo na početnu'); return;
+  }
+
+  // AI Chat
+  showScreen('screenChat');
+  setTimeout(() => sendMessageToAI(text), 300);
+}
+
+// Chat voice
+let chatRecognition = null;
+let isChatListening = false;
+
+function toggleChatVoice() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { showToast('Speech recognition nije podržan'); return; }
+
+  if (isChatListening) {
+    if (chatRecognition) chatRecognition.stop();
+    return;
+  }
+
+  chatRecognition = new SR();
+  chatRecognition.lang = 'sr-RS';
+  chatRecognition.continuous = false;
+  chatRecognition.interimResults = false;
+
+  chatRecognition.onstart = () => {
+    isChatListening = true;
+    document.getElementById('chatListenWave').classList.remove('hidden');
+    document.getElementById('chatMicBtn').style.background = 'rgba(79,142,247,0.2)';
+  };
+  chatRecognition.onend = () => {
+    isChatListening = false;
+    document.getElementById('chatListenWave').classList.add('hidden');
+    document.getElementById('chatMicBtn').style.background = '';
+  };
+  chatRecognition.onresult = (e) => {
+    const text = e.results[0][0].transcript;
+    document.getElementById('chatInput').value = text;
+    sendChatMessage();
+  };
+  chatRecognition.onerror = () => {
+    isChatListening = false;
+    document.getElementById('chatListenWave').classList.add('hidden');
+    document.getElementById('chatMicBtn').style.background = '';
+  };
+
+  try { chatRecognition.start(); } catch(e) {}
+}
+
+// ==========================================
+// AI CHAT
+// ==========================================
+function updateChatStatus() {
+  const label = document.getElementById('chatStatusLabel');
+  if (isOnline && groqApiKey && groqAvailable) {
+    label.textContent = '⚡ Groq AI — Online';
+  } else if (isOnline && groqApiKey) {
+    label.textContent = '🔄 Provjera Groq...';
+  } else {
+    label.textContent = '💻 Offline AI Mod';
+  }
+}
+
+async function sendChatMessage() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  autoResize(input);
+  await sendMessageToAI(text);
+}
+
+async function sendMessageToAI(text) {
+  if (!text.trim()) return;
+
+  addChatMessage('user', text);
+  chatHistory.push({ role: 'user', content: text });
+
+  // Show typing
+  const typingId = 'typing-' + Date.now();
+  const chatMsgs = document.getElementById('chatMessages');
+  const typingEl = document.createElement('div');
+  typingEl.id = typingId;
+  typingEl.className = 'msg luna';
+  typingEl.innerHTML = '<div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>';
+  chatMsgs.appendChild(typingEl);
+  chatMsgs.scrollTop = chatMsgs.scrollHeight;
+
+  let response = '';
+
+  if (isOnline && groqApiKey) {
+    try {
+      const sysPrompt = buildSystemPrompt();
+      const messages = chatHistory.slice(-10).map(m => ({ role: m.role, content: m.content }));
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${groqApiKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'llama3-8b-8192',
+          messages: [{ role: 'system', content: sysPrompt }, ...messages],
+          max_tokens: 500,
+          temperature: 0.7
+        })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        response = data.choices[0]?.message?.content || 'Nema odgovora.';
+        groqAvailable = true;
+        updateAIBadge(true);
+      } else {
+        groqAvailable = false;
+        response = await offlineAI(text);
+      }
+    } catch(e) {
+      groqAvailable = false;
+      response = await offlineAI(text);
+    }
+  } else {
+    response = await offlineAI(text);
+  }
+
+  // Remove typing
+  document.getElementById(typingId)?.remove();
+
+  addChatMessage('luna', response);
+  chatHistory.push({ role: 'assistant', content: response });
+  if (settings.tts) speak(response);
+  updateChatStatus();
+}
+
+function buildSystemPrompt() {
+  const p = PERSONALITIES[currentPersonality] || PERSONALITIES.smart;
+  const now = new Date();
+  return `${p.prompt}
+
+Datum: ${now.toLocaleDateString('sr-RS')}
+Vreme: ${now.toLocaleTimeString('sr-RS')}
+Korisnik: ${userName}
+
+Kada korisnik traži, možeš:
+- Pomoći sa organizacijom, podsetnicima, zadacima
+- Odgovoriti na opšta pitanja
+- Dati savete i preporuke
+Uvek odgovaraj kratko i jasno (2-4 rečenice). Uvek na srpskom.`;
+}
+
+async function offlineAI(text) {
+  const lower = text.toLowerCase();
+  const p = currentPersonality;
+  const now = new Date();
+
+  // Basic intent matching
+  if (lower.includes('dobro jutro') || lower.includes('zdravo') || lower.includes('ćao')) {
+    const greetings = {
+      smart: `Zdravo, ${userName}! Kako mogu da pomognem danas?`,
+      funny: `Ej ej ej, ${userName} se javio! 😄 Šta da uradimo danas?`,
+      oracle: `${userName}... tvoj dolazak je bio predviđen. 🔮 Šta tražiš?`,
+      business: `Dobar dan, ${userName}. Čime mogu da budem od pomoći?`
+    };
+    return greetings[p] || greetings.smart;
+  }
+
+  if (lower.includes('vreme') || lower.includes('sati') || lower.includes('koliko je')) {
+    return `Trenutno je ${now.toLocaleTimeString('sr-RS', {hour:'2-digit',minute:'2-digit'})} u ${now.toLocaleDateString('sr-RS')}.`;
+  }
+
+  if (lower.includes('kako si') || lower.includes('si dobro')) {
+    const replies = {
+      smart: 'Funkcionišem optimalno! Svi sistemi su aktivni.',
+      funny: 'Odlično sam, hvala što pitaš! 😁 Jedino mi nedostaje kafica.',
+      oracle: 'Postojim između trenutaka, uvek u ravnoteži...',
+      business: 'Operativno stanje: nominalno. Kako mogu pomoći?'
+    };
+    return replies[p] || replies.smart;
+  }
+
+  if (lower.includes('beleška') || lower.includes('zapiši')) {
+    return `Da kreiraš belešku, dodirni dugme "+" u sekciji Beleške. Možeš i reći "otvori beleške" da odemo tamo.`;
+  }
+
+  if (lower.includes('alarm') || lower.includes('probudi')) {
+    return `Za novi alarm, idi u Alarmi i dodirni "+". Možeš mi reći tačno vreme i naziv, pa ću te odvesti tamo.`;
+  }
+
+  if (lower.includes('zadatak') || lower.includes('posao') || lower.includes('lista')) {
+    const tasks = await dbGet('tasks');
+    const active = tasks.filter(t => !t.done);
+    if (active.length === 0) return `Nemaš aktivnih zadataka. Dodaj prvi u sekciji Zadaci!`;
+    return `Imaš ${active.length} aktivnih zadataka. Najhitniji: "${active[0].title}".`;
+  }
+
+  if (lower.includes('podsetnik')) {
+    return `Podsetnik možeš dodati u sekciji Podsetnici. Napiši šta treba i kada, i ja ću te glasovno obavijestiti.`;
+  }
+
+  if (lower.includes('hvala') || lower.includes('super') || lower.includes('odlično')) {
+    const ty = {
+      smart: `Nema na čemu, ${userName}! Uvek tu za tebe.`,
+      funny: `Ma hajde, nisi morao! 😊 Ali drago mi je!`,
+      oracle: `Tvoja zahvalnost se prima sa mirom...`,
+      business: `Na usluzi. Ima li još nešto?`
+    };
+    return ty[p] || ty.smart;
+  }
+
+  // Default
+  const defaults = {
+    smart: `Razumem te, ${userName}. Trenutno radim u offline modu. Za napredne odgovore, podesi Groq API ključ u Podešavanjima.`,
+    funny: `Hmm, to je dobro pitanje! 🤔 Ali sam offline pa ne mogu da guglam. Probaj u Podešavanjima da dodaš Groq API!`,
+    oracle: `Pitanje je jasno, ali odgovor leži u oblacima... Doslovno — treba ti internet i Groq API. 🔮`,
+    business: `Offline mod aktivan. Dodajte Groq API ključ u Podešavanjima za puni pristup AI funkcijama.`
+  };
+  return defaults[p] || defaults.smart;
+}
+
+function addChatMessage(role, text) {
+  const msgs = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  const now = new Date();
+  div.innerHTML = `${escHtml(text)}<div class="msg-time">${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function chatKeyDown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendChatMessage();
+  }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+// ==========================================
+// CONNECTIVITY
+// ==========================================
+function updateConnectivity() {
+  isOnline = navigator.onLine;
+  updateAIBadge(isOnline && groqAvailable);
+  updateStatusDots();
+}
+
+function updateAIBadge(useGroq) {
+  const badge = document.getElementById('aiStatusBadge');
+  if (useGroq) {
+    badge.className = 'badge-groq';
+    badge.textContent = '⚡ Groq';
+  } else {
+    badge.className = 'badge-offline';
+    badge.textContent = isOnline ? '🌐 Online' : '💻 Offline';
+  }
+}
+
+function updateStatusDots() {
+  const internetDot = document.getElementById('statusInternet');
+  const groqDot = document.getElementById('statusGroq');
+  const micDot = document.getElementById('statusMic');
+  const ttsDot = document.getElementById('statusTTS');
+  const dbDot = document.getElementById('statusDB');
+
+  internetDot.className = `status-dot ${isOnline ? 'online' : 'error'}`;
+  internetDot.textContent = isOnline ? 'Online' : 'Offline';
+
+  groqDot.className = `status-dot ${groqAvailable ? 'online' : ''}`;
+  groqDot.textContent = `Groq ${groqAvailable ? 'OK' : groqApiKey ? 'Error' : 'Nije podešen'}`;
+
+  const hasSR = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+  micDot.className = `status-dot ${hasSR ? 'online' : 'error'}`;
+  micDot.textContent = hasSR ? 'Mikrofon OK' : 'Nema SR';
+
+  const hasTTS = !!window.speechSynthesis;
+  ttsDot.className = `status-dot ${hasTTS ? 'online' : 'error'}`;
+  ttsDot.textContent = hasTTS ? 'Zvučnik OK' : 'Nema TTS';
+
+  dbDot.className = `status-dot ${db ? 'online' : 'error'}`;
+  dbDot.textContent = db ? 'Baza OK' : 'Nema BD';
+}
+
+// ==========================================
+// SETTINGS
+// ==========================================
+function loadSettings() {
+  document.getElementById('groqApiKeyInput').value = groqApiKey;
+  document.getElementById('userNameInput').value = userName;
+
+  // Theme opts
+  ['light','dark','amoled'].forEach(t => {
+    document.getElementById(`themeOpt${t.charAt(0).toUpperCase()+t.slice(1)}`)?.classList.remove('active');
+  });
+  const theme = document.documentElement.getAttribute('data-theme') || 'dark';
+  document.getElementById(`themeOpt${theme.charAt(0).toUpperCase()+theme.slice(1)}`)?.classList.add('active');
+
+  // Toggles
+  document.getElementById('toggleGreeting').className = `toggle ${settings.greeting ? 'on' : ''}`;
+  document.getElementById('toggleTTS').className = `toggle ${settings.tts ? 'on' : ''}`;
+  document.getElementById('toggleVoiceNotif').className = `toggle ${settings.voiceNotif ? 'on' : ''}`;
+
+  updateFullStatusPanel();
+}
+
+function saveGroqKey() {
+  groqApiKey = document.getElementById('groqApiKeyInput').value.trim();
+  localStorage.setItem('groqKey', groqApiKey);
+  if (!groqApiKey) { groqAvailable = false; updateAIBadge(false); }
+  updateStatusDots();
+}
+
+function saveUserName() {
+  userName = document.getElementById('userNameInput').value.trim() || 'Saša';
+  localStorage.setItem('userName', userName);
+  document.querySelector('.user-badge').textContent = userName;
+}
+
+async function testGroqConnection() {
+  const btn = document.getElementById('testGroqBtn');
+  const result = document.getElementById('groqTestResult');
+  btn.innerHTML = '<span class="spinner"></span> Testiranje...';
+  result.textContent = '';
+
+  try {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${groqApiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'llama3-8b-8192', messages: [{ role: 'user', content: 'Reci samo: OK' }], max_tokens: 10 })
+    });
+    if (res.ok) {
+      groqAvailable = true;
+      result.innerHTML = '<span style="color:#22c55e">✅ Konekcija uspešna! Groq AI je aktivan.</span>';
+      updateAIBadge(true);
+    } else {
+      groqAvailable = false;
+      result.innerHTML = `<span style="color:#ef4444">❌ Greška: ${res.status} ${res.statusText}</span>`;
+    }
+  } catch(e) {
+    groqAvailable = false;
+    result.innerHTML = '<span style="color:#ef4444">❌ Nema interneta ili API greška</span>';
+  }
+  btn.innerHTML = '🔗 Test';
+  updateStatusDots();
+}
+
+function toggleSetting(key, el) {
+  settings[key] = !settings[key];
+  el.className = `toggle ${settings[key] ? 'on' : ''}`;
+  localStorage.setItem(`setting_${key}`, settings[key]);
+}
+
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('theme', theme);
+  ['light','dark','amoled'].forEach(t => {
+    document.getElementById(`themeOpt${t.charAt(0).toUpperCase()+t.slice(1)}`)?.classList.remove('active');
+  });
+  document.getElementById(`themeOpt${theme.charAt(0).toUpperCase()+theme.slice(1)}`)?.classList.add('active');
+  document.getElementById('themeBtn').textContent = theme === 'light' ? '☀️' : theme === 'amoled' ? '⚫' : '🌙';
+}
+
+function cycleTheme() {
+  const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+  const themes = ['dark','light','amoled'];
+  const next = themes[(themes.indexOf(cur) + 1) % themes.length];
+  setTheme(next);
+}
+
+// 3D sliders
+function update3D() {
+  const v = document.getElementById('slider3d').value;
+  document.getElementById('val3d').textContent = parseFloat(v).toFixed(1);
+  document.documentElement.style.setProperty('--3d-depth', v);
+  localStorage.setItem('3d_depth', v);
+}
+function updateGlow() {
+  const v = document.getElementById('sliderGlow').value;
+  document.getElementById('valGlow').textContent = parseFloat(v).toFixed(1);
+  document.documentElement.style.setProperty('--glow-intensity', v);
+  localStorage.setItem('glow_intensity', v);
+}
+function updateGlass() {
+  const v = document.getElementById('sliderGlass').value;
+  document.getElementById('valGlass').textContent = parseFloat(v).toFixed(1);
+  document.documentElement.style.setProperty('--glass-opacity', v * 0.08);
+  localStorage.setItem('glass_opacity', v);
+}
+function updateRadius() {
+  const v = document.getElementById('sliderRadius').value;
+  document.getElementById('valRadius').textContent = parseFloat(v).toFixed(1);
+  document.documentElement.style.setProperty('--border-radius-mult', v);
+  localStorage.setItem('radius_mult', v);
+}
+function updateShadow() {
+  const v = document.getElementById('sliderShadow').value;
+  document.getElementById('valShadow').textContent = parseFloat(v).toFixed(1);
+  document.documentElement.style.setProperty('--shadow-intensity', v);
+  localStorage.setItem('shadow_intensity', v);
+}
+
+function loadSavedSliders() {
+  const pairs = [
+    ['3d_depth', 'slider3d', 'val3d', '--3d-depth', 1],
+    ['glow_intensity', 'sliderGlow', 'valGlow', '--glow-intensity', 1],
+    ['glass_opacity', 'sliderGlass', 'valGlass', '--glass-opacity', 1, 0.08],
+    ['radius_mult', 'sliderRadius', 'valRadius', '--border-radius-mult', 1],
+    ['shadow_intensity', 'sliderShadow', 'valShadow', '--shadow-intensity', 1],
+  ];
+  pairs.forEach(([key, sliderId, valId, cssVar, def, multiplier]) => {
+    const v = localStorage.getItem(key) || def;
+    const el = document.getElementById(sliderId);
+    const vEl = document.getElementById(valId);
+    if (el) el.value = v;
+    if (vEl) vEl.textContent = parseFloat(v).toFixed(1);
+    document.documentElement.style.setProperty(cssVar, multiplier ? v * multiplier : v);
+  });
+}
+
+function updateFullStatusPanel() {
+  const panel = document.getElementById('fullStatusPanel');
+  const items = [
+    { label: 'Internet', ok: isOnline },
+    { label: 'Groq API', ok: groqAvailable },
+    { label: 'Mikrofon', ok: !!(window.SpeechRecognition || window.webkitSpeechRecognition) },
+    { label: 'Zvučnik', ok: !!window.speechSynthesis },
+    { label: 'Baza', ok: !!db },
+    { label: 'PWA', ok: window.matchMedia('(display-mode: standalone)').matches },
+  ];
+  panel.innerHTML = items.map(i => `
+    <div class="status-pill">
+      <div class="dot" style="background:${i.ok ? '#22c55e' : '#ef4444'};box-shadow:0 0 6px ${i.ok ? 'rgba(34,197,94,0.6)' : 'rgba(239,68,68,0.4)'}"></div>
+      ${i.label}
+    </div>
+  `).join('');
+}
+
+// ==========================================
+// PERSONALITY
+// ==========================================
+function setPersonality(name, el) {
+  currentPersonality = name;
+  document.querySelectorAll('.personality-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  localStorage.setItem('personality', name);
+  const p = PERSONALITIES[name];
+  if (p) showToast(`🎭 Ličnost: ${p.name}`);
+}
+
+// ==========================================
+// GREETING
+// ==========================================
+async function greetUser() {
+  if (!settings.greeting) return;
+
+  const [tasks, alarms, reminders] = await Promise.all([
+    dbGet('tasks'), dbGet('alarms'), dbGet('reminders')
+  ]);
+
+  const now = new Date();
+  const h = now.getHours();
+  let greeting = h < 12 ? 'Dobro jutro' : h < 18 ? 'Dobar dan' : 'Dobro veče';
+
+  const activeTasks = tasks.filter(t => !t.done).length;
+  const activeAlarms = alarms.filter(a => a.active).length;
+  const activeReminders = reminders.filter(r => !r.fired).length;
+
+  let text = `${greeting}, ${userName}. `;
+
+  const parts = [];
+  if (activeTasks > 0) parts.push(`${activeTasks} ${activeTasks === 1 ? 'zadatak' : 'zadataka'}`);
+  if (activeReminders > 0) parts.push(`${activeReminders} ${activeReminders === 1 ? 'podsetnik' : 'podsetnika'}`);
+  if (activeAlarms > 0) parts.push(`${activeAlarms} ${activeAlarms === 1 ? 'alarm' : 'alarma'}`);
+
+  if (parts.length > 0) {
+    text += `Danas imaš ${parts.join(', ')}.`;
+  } else {
+    text += 'Nemaš planiranih obaveza. Lep dan!';
+  }
+
+  setTimeout(() => speak(text), 1500);
+}
+
+// ==========================================
+// SEARCH
+// ==========================================
+async function doSearch(query) {
+  if (!query.trim()) { refreshDashboard(); return; }
+
+  const lower = query.toLowerCase();
+  const [notes, tasks, reminders] = await Promise.all([dbGet('notes'), dbGet('tasks'), dbGet('reminders')]);
+
+  const matchNotes = notes.filter(n => n.title.toLowerCase().includes(lower) || n.content.toLowerCase().includes(lower));
+  const matchTasks = tasks.filter(t => t.title.toLowerCase().includes(lower));
+  const matchReminders = reminders.filter(r => r.title.toLowerCase().includes(lower));
+
+  // Show results inline (future: dedicated results screen)
+  showToast(`🔍 ${matchNotes.length + matchTasks.length + matchReminders.length} rezultata`);
+}
+
+// ==========================================
+// NOTIFICATIONS
+// ==========================================
+async function requestNotifPerms() {
+  if ('Notification' in window && Notification.permission === 'default') {
+    await Notification.requestPermission();
+  }
+}
+
+function sendNotification(title, body) {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    try { new Notification(title, { body, icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🤖</text></svg>' }); } catch(e) {}
+  }
+}
+
+// ==========================================
+// EXPORT / IMPORT
+// ==========================================
+async function exportData() {
+  const data = {};
+  for (const store of ['notes','alarms','tasks','reminders','events']) {
+    data[store] = await dbGet(store);
+  }
+  data.settings = { groqApiKey, userName, personality: currentPersonality };
+
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `luna-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('📤 Podaci exportovani');
+}
+
+function importData() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const text = await file.text();
+    try {
+      const data = JSON.parse(text);
+      for (const store of ['notes','alarms','tasks','reminders','events']) {
+        if (data[store]) {
+          for (const item of data[store]) await dbPut(store, item);
+        }
+      }
+      if (data.settings) {
+        if (data.settings.groqApiKey) { groqApiKey = data.settings.groqApiKey; localStorage.setItem('groqKey', groqApiKey); }
+        if (data.settings.userName) { userName = data.settings.userName; localStorage.setItem('userName', userName); }
+      }
+      refreshDashboard();
+      showToast('📥 Podaci uvezeni');
+    } catch(e) {
+      showToast('❌ Greška pri uvozu');
+    }
+  };
+  input.click();
+}
+
+function confirmClearData() {
+  if (confirm('Da li ste sigurni da želite da obrišete sve podatke?')) {
+    ['notes','alarms','tasks','reminders','events'].forEach(async store => {
+      const items = await dbGet(store);
+      for (const item of items) await dbDelete(store, item.id);
+    });
+    refreshDashboard();
+    showToast('🗑️ Svi podaci obrisani');
+  }
+}
+
+// ==========================================
+// UTILITIES
+// ==========================================
+function showToast(msg, duration = 2500) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), duration);
+}
+
+function escHtml(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function formatDate(ts) {
+  if (!ts) return '';
+  const d = new Date(ts);
+  return `${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()}`;
+}
+
+function formatDateTime(str) {
+  if (!str) return '';
+  const d = new Date(str);
+  if (isNaN(d)) return str;
+  return `${d.getDate()}.${d.getMonth()+1} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+// ==========================================
+// SERVICE WORKER REGISTRATION
+// ==========================================
+function registerSW() {
+  if ('serviceWorker' in navigator) {
+    const swBlob = new Blob([`
+      const CACHE = 'luna-v1';
+      const ASSETS = [location.origin + '/luna-ai.html'];
+      self.addEventListener('install', e => {
+        e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).catch(()=>{}));
+        self.skipWaiting();
+      });
+      self.addEventListener('activate', e => { e.waitUntil(self.clients.claim()); });
+      self.addEventListener('fetch', e => {
+        if (e.request.method !== 'GET') return;
+        e.respondWith(
+          caches.match(e.request).then(cached => cached || fetch(e.request).catch(() => cached))
+        );
+      });
+    `], { type: 'application/javascript' });
+    const swUrl = URL.createObjectURL(swBlob);
+    navigator.serviceWorker.register(swUrl).catch(() => {});
+  }
+}
+
+// ==========================================
+// INIT
+// ==========================================
+async function init() {
+  // Load localStorage
+  groqApiKey = localStorage.getItem('groqKey') || '';
+  userName = localStorage.getItem('userName') || 'Saša';
+  currentPersonality = localStorage.getItem('personality') || 'smart';
+  const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+  // Load settings toggles
+  ['greeting','tts','voiceNotif'].forEach(k => {
+    const v = localStorage.getItem(`setting_${k}`);
+    if (v !== null) settings[k] = v === 'true';
+  });
+
+  // Apply theme
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('themeBtn').textContent = theme === 'light' ? '☀️' : theme === 'amoled' ? '⚫' : '🌙';
+
+  // Init DB
+  await initDB();
+  updateStatusDots();
+
+  // Load sliders
+  loadSavedSliders();
+
+  // Set personality UI
+  const pBtn = document.querySelector(`[data-personality="${currentPersonality}"]`);
+  if (pBtn) {
+    document.querySelectorAll('.personality-btn').forEach(b => b.classList.remove('active'));
+    pBtn.classList.add('active');
+  }
+
+  // Update user badge
+  document.querySelector('.user-badge').textContent = userName;
+
+  // Load dashboard
+  await refreshDashboard();
+
+  // Start alarm checker
+  startAlarmChecker();
+
+  // Init voice
+  recognition = initSpeechRecognition();
+  if (synth) synth.onvoiceschanged = () => {};
+
+  // Connectivity
+  window.addEventListener('online', () => { isOnline = true; updateConnectivity(); showToast('🌐 Internet spojen'); });
+  window.addEventListener('offline', () => { isOnline = false; updateConnectivity(); showToast('📵 Nema interneta'); });
+
+  // Notifications
+  requestNotifPerms();
+
+  // SW
+  registerSW();
+
+  // Test Groq silently if key exists
+  if (groqApiKey && isOnline) {
+    fetch('https://api.groq.com/openai/v1/models', {
+      headers: { 'Authorization': `Bearer ${groqApiKey}` }
+    }).then(r => {
+      groqAvailable = r.ok;
+      updateAIBadge(r.ok);
+      updateStatusDots();
+    }).catch(() => {});
+  }
+
+  // Greeting
+  await greetUser();
+
+  // Welcome chat message
+  const now = new Date();
+  const h = now.getHours();
+  const greeting = h < 12 ? 'Dobro jutro' : h < 18 ? 'Dobar dan' : 'Dobro veče';
+  addChatMessage('luna', `${greeting}, ${userName}! 👋 Ja sam Luna, tvoja AI sekretarica. Kako mogu da pomognem danas? Možeš mi pisati ili koristiti glasovne komande.`);
+
+  // Set chat status
+  updateChatStatus();
+}
+
+// Start
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
